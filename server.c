@@ -18,6 +18,7 @@ Dictionary *dict;
 
 //the thread function
 void *connection_handler(void *);
+void printdict();
  
 int main(int argc , char *argv[])
 {
@@ -83,7 +84,13 @@ int main(int argc , char *argv[])
      
     return 0;
 }
- 
+void printdict(){
+  printf("printdict");  
+  while(dict->tail != NULL) {
+        printf("key: %s ,value: %s",dict->head->key,dict->head->value);
+        dict = dict->tail;
+    }
+}
 /*
  * This will handle connection for each client
  * */
@@ -111,17 +118,20 @@ void *connection_handler(void *socket_desc)
     //end of string marker
 	client_message[read_size] = '\0';      
 	ptr=strpbrk(client_message, ".+*-");
-	
 	if(ptr != NULL && strlen(strchr(client_message,*ptr))>2){  
 		write(sock , "Ack\n" , strlen("Ack\n"));
-        if(strchr(client_message,ch)){//message type .path id
-            write(sock ,strchr(client_message,ch) , strlen(strchr(client_message,ch)));
-            write(sock ,strtok(client_message," ") , strlen(strtok(client_message," ")));
-            dict_add(dict,strtok(client_message," "),strchr(client_message,ch));
+        if(strchr(client_message,ch) && strcmp(ptr,".")==0){//message type .path id
+            key=strtok(client_message," ");
+            value=strtok(NULL," ");
+            write(sock ,key, strlen(key));
+            write(sock ,value, strlen(value));
+            dict_add(dict,key,value);
+            //printdict();
         }
-        else{//message type (./+/-/*)path 
-            //section 2,3,4,5 
-        }
+        //message type (./+/-/*)path //section 2,3,4,5 
+        else if(strchr(client_message,'.'))  
+            write(sock , dict_get(dict,key), strlen(dict_get(dict,key)));
+        
     }
 	    //dict_add(dict, const char *key, char * value)		
 	else

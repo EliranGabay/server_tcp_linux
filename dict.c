@@ -23,12 +23,16 @@
         dictionary = dictionary->tail;
     }
     int key_length = strlen(key) + 1;
+    int value_length = strlen(value) + 1;
     dictionary->head = (KVPair*)malloc(sizeof(KVPair));
     assert(dictionary->head != NULL);
     dictionary->head->key = (char *)malloc(key_length * sizeof(char));
+    dictionary->head->value = (char *)malloc(value_length * sizeof(char));
     assert(dictionary->head->key != NULL);
     strcpy(dictionary->head->key, key);
-    dictionary->head->value = value;
+    assert(dictionary->head->value != NULL);
+    strcpy(dictionary->head->value, value);
+    
 }
 
  int dict_has(Dictionary *dictionary, const char *key) {

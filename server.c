@@ -2,6 +2,7 @@
     C socket server example, handles multiple clients using threads
     Compile
     gcc server.c -lpthread -o server
+
 */
 #include"dict.h"
 #include<stdio.h>
@@ -13,6 +14,7 @@
 #include<unistd.h>    //write
 #include<pthread.h> //for threading , link with lpthread
 
+Dictionary *dict;
 
 //the thread function
 void *connection_handler(void *);
@@ -21,7 +23,8 @@ int main(int argc , char *argv[])
 {
     int socket_desc , client_sock , c;
     struct sockaddr_in server , client;
-     
+     	
+    dict=dict_new();  
     //Create socket
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1)
@@ -92,7 +95,7 @@ void *connection_handler(void *socket_desc)
     int b,e;
     const char ch = ' ';
     char *message , client_message[2000],*ptr,*match,*key,*value;
-    Dictionary *dict;
+ 
 
     //Send some messages to the client
     message = "Greetings! I am your connection handler\n";
@@ -100,8 +103,7 @@ void *connection_handler(void *socket_desc)
      
     message = "Send me (./+/*/-)path id.\n";
     write(sock , message , strlen(message));
-	
-    dict=dict_new();    
+  
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 )
     {
@@ -110,7 +112,7 @@ void *connection_handler(void *socket_desc)
 	client_message[read_size] = '\0';      
 	ptr=strpbrk(client_message, ".+*-");
 	
-	if(ptr != NULL && client_message[0] == *ptr && strlen(strchr(client_message,*ptr))>2){  
+	if(ptr != NULL && strlen(strchr(client_message,*ptr))>2){  
 		write(sock , "Ack\n" , strlen("Ack\n"));
         if(strchr(client_message,ch)){//message type .path id
             write(sock ,strchr(client_message,ch) , strlen(strchr(client_message,ch)));

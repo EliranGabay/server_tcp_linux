@@ -4,3 +4,6 @@ gcc -c dict.c
 gcc server.o dict.o -o server -lpthread
 ./server
 exit 1
+
+#lsof -i:8888 to get pid
+#kill -9 "pid" to kill the port

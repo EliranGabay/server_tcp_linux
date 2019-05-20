@@ -12,7 +12,6 @@ Dictionary *dict_new()
     assert(dictionary != NULL);
     dictionary->head = NULL;
     dictionary->tail = NULL;
-    size++;
     return dictionary;
 }
 
@@ -40,6 +39,7 @@ void dict_add(Dictionary *dictionary, const char *key, char *value)
     strcpy(dictionary->head->key, key);
     assert(dictionary->head->value != NULL);
     strcpy(dictionary->head->value, value);
+    size++;
 }
 
 int dict_has(Dictionary *dictionary, const char *key)
@@ -58,6 +58,7 @@ int dict_has(Dictionary *dictionary, const char *key)
 char *dict_get(Dictionary *dictionary, const char *key)
 {
     Dictionary *temp=dictionary;
+    
     for (int i = 0; i < size; i++)
     {
         if(strcmp(temp->head->key,key)==0){
@@ -116,6 +117,27 @@ void printdict(Dictionary *dict)
     printf("size is : %d\n",size);
 }
 
+int checkrisha(char *key,Dictionary *dict){
+    int result=0,flag=0;
+    Dictionary *temp = dict;
+    for (int i = 0; i <size; i++)
+    {
+        if(strstr(key,temp->head->key))
+        {
+            for (int j = 0; j < sizeof(key); j++)
+                if(key[j] != temp->head->key[j]){
+                    flag=1;
+                    break;
+                }  
+            if(flag == 0){
+                if(atoi(temp->head->value)>0)
+                    result+=atoi(temp->head->value);
+            }        
+        }
+        temp=temp->tail;     
+    }
+    return result;
+}
 
 void dict_free(Dictionary *dictionary)
 {

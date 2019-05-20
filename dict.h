@@ -17,3 +17,4 @@ char *dict_get(Dictionary *dictionary, const char *key);
 void dict_remove(Dictionary *dictionary, const char *key);
 void dict_free(Dictionary *dictionary);
 void printdict(Dictionary *dict);
+int checkrisha(char *key,Dictionary *dict);

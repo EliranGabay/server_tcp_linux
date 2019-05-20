@@ -126,19 +126,24 @@ void *connection_handler(void *socket_desc)
                     write(sock, value, strlen(value));
                 }
             }
-            else if (client_message[0]=='+'){//+
-                client_message[0]='!';
-                key=strtok(client_message,"!");
-                key[strlen(key)-1]='\0';
-                value=dict_get(dict, key); 
-                if(value != NULL){
-                    value[strlen(value)-1]='\0';
-                    if(atoi(value)>0){
-                        sprintf(value,"%d",atoi(value)+1);
-                        dict_add(dict, key, value);
-                    }
-                }
+            // else if (client_message[0]=='+'){//+
+            //     client_message[0]='!';
+            //     key=strtok(client_message,"!");
+            //     key[strlen(key)-1]='\0';
+            //     value=dict_get(dict, key); 
+            //     if(value != NULL){
+            //         value[strlen(value)-1]='\0';
+            //         if(atoi(value)>0){
+            //             sprintf(value,"%d",atoi(value)+1);
+            //             dict_add(dict, key, value);
+            //         }
+            //     }
+            // }
+            else if (client_message[0]=='*'){
+
             }
+            else
+                write(sock, "BAD INPUT!\n", 12);
         }
         else
             write(sock, "BAD INPUT!\n", 12);

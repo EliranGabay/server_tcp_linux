@@ -2,6 +2,9 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+int size=0;
 
 Dictionary *dict_new()
 {
@@ -9,6 +12,7 @@ Dictionary *dict_new()
     assert(dictionary != NULL);
     dictionary->head = NULL;
     dictionary->tail = NULL;
+    size++;
     return dictionary;
 }
 
@@ -53,15 +57,15 @@ int dict_has(Dictionary *dictionary, const char *key)
 
 char *dict_get(Dictionary *dictionary, const char *key)
 {
-    if (dictionary->head == NULL)
-        return 0;
-    while (dictionary != NULL)
+    Dictionary *temp=dictionary;
+    for (int i = 0; i < size; i++)
     {
-        if (strcmp(dictionary->head->key, key) == 0)
-            return dictionary->head->value;
-        dictionary = dictionary->tail;
+        if(strcmp(temp->head->key,key)==0){
+            return temp->head->value;
+        }
+        temp=temp->tail;    
     }
-    return 0;
+    return NULL;
 }
 
 void dict_remove(Dictionary *dictionary, const char *key)
@@ -100,6 +104,18 @@ void dict_remove(Dictionary *dictionary, const char *key)
         dictionary = dictionary->tail;
     }
 }
+
+void printdict(Dictionary *dict)
+{
+    Dictionary *temp = dict;
+    for (int i = 0; i < size; i++)
+    {
+        printf("key: %s ,value: %s\n", temp->head->key, temp->head->value);
+        temp = temp->tail;
+    }    
+    printf("size is : %d\n",size);
+}
+
 
 void dict_free(Dictionary *dictionary)
 {

@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(8888);
+    server.sin_port = htons(9999);
     //Bind
     if (bind(socket_desc, (struct sockaddr *)&server, sizeof(server)) < 0)
     {
@@ -65,23 +65,17 @@ int main(int argc, char *argv[])
         //Now join the thread , so that we dont terminate before the thread
         //pthread_join( thread_id , NULL);
         puts("Handler assigned");
+  
     }
     if (client_sock < 0)
     {
         perror("accept failed");
         return 1;
     }
+    
     return 0;
 }
-void printdict()
-{
-    printf("printdict");
-    while (dict->tail != NULL)
-    {
-        printf("key: %s ,value: %s", dict->head->key, dict->head->value);
-        dict = dict->tail;
-    }
-}
+
 /*
  * This will handle connection for each client
  * */
@@ -103,34 +97,58 @@ void *connection_handler(void *socket_desc)
     //Receive a message from client
     while ((read_size = recv(sock, client_message, 2000, 0)) > 0)
     {
+        key=NULL;
+        value=NULL;
+        ptr=NULL;
         //end of string marker
-        client_message[read_size] = '\0';
+        //client_message[read_size] = '\0';
         ptr = strpbrk(client_message, ".+*-");
         if (ptr != NULL && strlen(strchr(client_message, *ptr)) > 2)
         {
-            write(sock, "Ack\n", strlen("Ack\n"));
-            if (strchr(client_message, ch) && strcmp(ptr, ".") == 0)
+            //write(sock, "Ack\n", strlen("Ack\n"));
+            if (strchr(client_message, ch) && client_message[0]=='.')
             { //message type .path id
-                key = strtok(client_message, " ");
+                client_message[0]='!';
+                key=strtok(client_message,"!");
+                key = strtok(key, " ");
                 value = strtok(NULL, " ");
-                write(sock, key, strlen(key));
-                write(sock, value, strlen(value));
+                //write(sock, key, strlen(key));
+                //write(sock, value, strlen(value));
                 dict_add(dict, key, value);
-                //printdict();
             }
             //message type (./+/-/*)path //section 2,3,4,5
-            else if (strchr(client_message, '.'))
-                write(sock, dict_get(dict, key), strlen(dict_get(dict, key)));
+            else if (client_message[0]=='.'){//.
+                client_message[0]='!';
+                key=strtok(client_message,"!");
+                key[strlen(key)-1]='\0';
+                value=dict_get(dict, key);
+                if(value != NULL){
+                    write(sock, value, strlen(value));
+                }
+            }
+            else if (client_message[0]=='+'){//+
+                client_message[0]='!';
+                key=strtok(client_message,"!");
+                key[strlen(key)-1]='\0';
+                value=dict_get(dict, key); 
+                if(value != NULL){
+                    value[strlen(value)-1]='\0';
+                    if(atoi(value)>0){
+                        sprintf(value,"%d",atoi(value)+1);
+                        dict_add(dict, key, value);
+                    }
+                }
+            }
         }
-        //dict_add(dict, const char *key, char * value)
         else
-            write(sock, "BAD\n", strlen("Ack\n"));
+            write(sock, "BAD INPUT!\n", 12);
         //clear the message buffer
         memset(client_message, 0, 2000);
     }
     if (read_size == 0)
     {
         puts("Client disconnected");
+        printdict(dict);
         fflush(stdout);
     }
     else if (read_size == -1)

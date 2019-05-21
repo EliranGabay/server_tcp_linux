@@ -90,6 +90,7 @@ void dict_remove(Dictionary *dictionary, const char *key)
                     dictionary->tail = toremove->tail;
                     free(toremove->head);
                     free(toremove);
+                    size--;
                     return;
                 }
             }
@@ -100,6 +101,7 @@ void dict_remove(Dictionary *dictionary, const char *key)
             free(dictionary->head->key);
             free(dictionary->head);
             free(dictionary);
+            size--;
             return;
         }
         previous = dictionary;
@@ -143,7 +145,56 @@ int checkrisha(char *key, Dictionary *dict)
     }
     return result;
 }
+void dictToFile(Dictionary *dict){
+    FILE *outfile; 
+    Dictionary *temp=dict;  
+    // open file for writing 
+    outfile = fopen ("storage.txt", "w"); 
+    if (outfile == NULL) 
+    { 
+        fprintf(stderr, "\nError opend file\n"); 
+        return; 
+    }
+    for (int i = 0; i < size; i++){
+        //fwrite(&temp->head, sizeof(KVPair),1,outfile);
+        fprintf(outfile,"%s %s",temp->head->key,temp->head->value);
+        temp=temp->tail;
+    } 
+    if(fwrite != 0)  
+        printf("contents to file written successfully !\n"); 
+    else 
+        printf("error writing file !\n"); 
+  
+    // close file 
+    fclose (outfile); 
+}
 
+void FileToDict(Dictionary *dict){
+    FILE *outfile;
+    char key[10],value[10],buffer[100];
+     // open file for writing 
+    outfile = fopen ("storage.txt", "r"); 
+    if (outfile == NULL) 
+    { 
+        return; 
+    }
+    rewind(outfile);
+    while(!feof(outfile)){
+        //fgets(buffer,100,outfile);
+        fscanf(outfile,"%s%s\n",key,value);
+        //key=strtok(buffer," ");
+        //value=strtok(NULL," ");
+        printf("key: %s value: %s\n",key,value);
+        key[strlen(key)]='\0';
+        value[strlen(value)]='\n';
+        value[strlen(value)+1]='\0';
+        dict_add(dict,key,value);  
+    }
+
+     // close file 
+    fclose (outfile);    
+    printdict(dict);
+}
 void dict_free(Dictionary *dictionary)
 {
     if (dictionary == NULL)

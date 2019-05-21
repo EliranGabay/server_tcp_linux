@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     int socket_desc, client_sock, c;
     struct sockaddr_in server, client;
     dict = dict_new();
+    FileToDict(dict);
     //Create socket
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_desc == -1)
@@ -165,6 +166,7 @@ void *connection_handler(void *socket_desc)
     if (read_size == 0)
     {
         puts("Client disconnected");
+        dictToFile(dict);
         //printdict(dict);
         fflush(stdout);
     }

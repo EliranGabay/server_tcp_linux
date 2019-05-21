@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int size=0;
+int size = 0;
 
 Dictionary *dict_new()
 {
@@ -57,14 +57,15 @@ int dict_has(Dictionary *dictionary, const char *key)
 
 char *dict_get(Dictionary *dictionary, const char *key)
 {
-    Dictionary *temp=dictionary;
-    
+    Dictionary *temp = dictionary;
+
     for (int i = 0; i < size; i++)
     {
-        if(strcmp(temp->head->key,key)==0){
+        if (strcmp(temp->head->key, key) == 0)
+        {
             return temp->head->value;
         }
-        temp=temp->tail;    
+        temp = temp->tail;
     }
     return NULL;
 }
@@ -113,28 +114,32 @@ void printdict(Dictionary *dict)
     {
         printf("key: %s ,value: %s\n", temp->head->key, temp->head->value);
         temp = temp->tail;
-    }    
-    printf("size is : %d\n",size);
+    }
+    printf("size is : %d\n", size);
 }
 
-int checkrisha(char *key,Dictionary *dict){
-    int result=0,flag=0;
+int checkrisha(char *key, Dictionary *dict)
+{
+    int result = 0, flag = 0;
     Dictionary *temp = dict;
-    for (int i = 0; i <size; i++)
+    char *tempkey, *tempvalue;
+    for (int i = 0; i < size; i++)
     {
-        if(strstr(key,temp->head->key))
+        tempkey = temp->head->key;
+        tempvalue = temp->head->value;
+        flag = 0;
+        for (int j = 0; j < strlen(key); j++)
         {
-            for (int j = 0; j < sizeof(key); j++)
-                if(key[j] != temp->head->key[j]){
-                    flag=1;
-                    break;
-                }  
-            if(flag == 0){
-                if(atoi(temp->head->value)>0)
-                    result+=atoi(temp->head->value);
-            }        
+            if (key[j] != tempkey[j] && flag == 0)
+            {
+                flag = 1;
+            }
         }
-        temp=temp->tail;     
+        if (flag == 0)
+        {
+            result += atoi(tempvalue);
+        }
+        temp = temp->tail;
     }
     return result;
 }

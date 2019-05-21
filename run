@@ -1,9 +1,6 @@
 #!/bin/bash
-lsof -i:8888
 gcc -c server.c 
 gcc -c dict.c
 gcc server.o dict.o -o server -lpthread
 ./server
 exit 1
-
-#kill -9 "pid" to kill the port

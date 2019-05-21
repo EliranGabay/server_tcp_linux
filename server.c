@@ -66,14 +66,12 @@ int main(int argc, char *argv[])
         //Now join the thread , so that we dont terminate before the thread
         //pthread_join( thread_id , NULL);
         puts("Handler assigned");
-  
     }
     if (client_sock < 0)
     {
         perror("accept failed");
         return 1;
     }
-    
     return 0;
 }
 
@@ -98,19 +96,19 @@ void *connection_handler(void *socket_desc)
     //Receive a message from client
     while ((read_size = recv(sock, client_message, 2000, 0)) > 0)
     {
-        key=NULL;
-        value=NULL;
-        ptr=NULL;
+        key = NULL;
+        value = NULL;
+        ptr = NULL;
         //end of string marker
         //client_message[read_size] = '\0';
         ptr = strpbrk(client_message, ".+*-");
         if (ptr != NULL && strlen(strchr(client_message, *ptr)) > 2)
         {
             //write(sock, "Ack\n", strlen("Ack\n"));
-            if (strchr(client_message, ch) && client_message[0]=='.')
+            if (strchr(client_message, ch) && client_message[0] == '.')
             { //message type .path id
-                client_message[0]='!';
-                key=strtok(client_message,"!");
+                client_message[0] = '!';
+                key = strtok(client_message, "!");
                 key = strtok(key, " ");
                 value = strtok(NULL, " ");
                 //write(sock, key, strlen(key));
@@ -118,38 +116,43 @@ void *connection_handler(void *socket_desc)
                 dict_add(dict, key, value);
             }
             //message type (./+/-/*)path //section 2,3,4,5
-            else if (client_message[0]=='.'){//.
-                client_message[0]='!';
-                key=strtok(client_message,"!");
-                key[strlen(key)-1]='\0';
-                value=dict_get(dict, key);
-                if(value != NULL){
+            else if (client_message[0] == '.')
+            { //.
+                client_message[0] = '!';
+                key = strtok(client_message, "!");
+                key[strlen(key) - 1] = '\0';
+                value = dict_get(dict, key);
+                if (value != NULL)
+                {
                     write(sock, value, strlen(value));
                 }
             }
-            else if (client_message[0]=='+'){//+
-                client_message[0]='!';
-                key=strtok(client_message,"!");
-                key[strlen(key)-1]='\0';
-                value=dict_get(dict, key); 
-                if(value != NULL){
-                    if(atoi(value)>0){
-                        sprintf(value,"%d\n",(atoi(value)+1));
+            else if (client_message[0] == '+')
+            { //+
+                client_message[0] = '!';
+                key = strtok(client_message, "!");
+                key[strlen(key) - 1] = '\0';
+                value = dict_get(dict, key);
+                if (value != NULL)
+                {
+                    if (atoi(value) > 0)
+                    {
+                        sprintf(value, "%d\n", (atoi(value) + 1));
                         //value[strlen(value)]='\0';
                         write(sock, value, strlen(value));
-                       // dict_add(dict, key, value);
+                        // dict_add(dict, key, value);
                     }
                 }
             }
-            else if (client_message[0]=='*'){//*
-                client_message[0]='!';
-                key=strtok(client_message,"!");
-                key[strlen(key)-1]='\0';
-                int t=checkrisha(key,dict);
-                char mm[20];
-                sprintf(mm,"%d\n",t);
-                write(sock,mm,strlen(mm));
-             
+            else if (client_message[0] == '*')
+            {
+                client_message[0] = '!';
+                key = strtok(client_message, "!");
+                key[strlen(key) - 1] = '\0';
+                int t = checkrisha(key, dict);
+                char tempval[20];
+                sprintf(tempval, "%d\n", t);
+                write(sock, tempval, strlen(tempval));
             }
             else
                 write(sock, "BAD INPUT!\n", 12);
@@ -169,6 +172,5 @@ void *connection_handler(void *socket_desc)
     {
         perror("recv failed");
     }
-
     return 0;
 }

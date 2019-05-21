@@ -90,6 +90,7 @@ void dict_remove(Dictionary *dictionary, const char *key)
                     dictionary->tail = toremove->tail;
                     free(toremove->head);
                     free(toremove);
+                    size--;
                     return;
                 }
             }
@@ -100,6 +101,7 @@ void dict_remove(Dictionary *dictionary, const char *key)
             free(dictionary->head->key);
             free(dictionary->head);
             free(dictionary);
+            size--;
             return;
         }
         previous = dictionary;

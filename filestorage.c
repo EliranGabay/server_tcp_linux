@@ -12,7 +12,6 @@ void dictToFile(Dictionary *dict){
         return; 
     }
     for (int i = 0; i < getSize(); i++){
-        //fwrite(&temp->head, sizeof(KVPair),1,outfile);
         fprintf(outfile,"%s %s",temp->head->key,temp->head->value);
         temp=temp->tail;
     } 
@@ -27,7 +26,7 @@ void dictToFile(Dictionary *dict){
 
 void FileToDict(Dictionary *dict){
     FILE *outfile;
-    char key[10],value[10],buffer[100];
+    char key[10],value[10];
      // open file for writing 
     outfile = fopen ("storage.txt", "r"); 
     if (outfile == NULL) 

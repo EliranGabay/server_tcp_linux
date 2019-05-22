@@ -86,7 +86,7 @@ void *connection_handler(void *socket_desc)
     int read_size;
     int b, e;
     const char ch = ' ';
-    char *message, client_message[2000], *ptr, *match, *key, *value;
+    char *message, client_message[2000], *ptr, *match, *key, *value,str[100];
     //Send some messages to the client
     message = "Greetings! I am your connection handler\n";
     write(sock, message, strlen(message));
@@ -139,9 +139,6 @@ void *connection_handler(void *socket_desc)
                     if (atoi(value) > 0)
                     {
                         sprintf(value, "%d\n", (atoi(value) + 1));
-                        //value[strlen(value)]='\0';
-                        write(sock, value, strlen(value));
-                        // dict_add(dict, key, value);
                     }
                 }
             }
@@ -154,6 +151,25 @@ void *connection_handler(void *socket_desc)
                 char tempval[20];
                 sprintf(tempval, "%d\n", t);
                 write(sock, tempval, strlen(tempval));
+            }
+               else if (client_message[0] == '-')
+            {
+                client_message[0] = '!';
+                key = strtok(client_message, "!");
+                key[strlen(key) - 1] = '\0';
+                value = dict_get(dict, key);
+                value[strlen(value)] = '\0';
+          
+                strcpy(str, key);
+                strcat(str, ".");
+                strcat(str,value);
+                str[strlen(str)-1]='\0';
+                value = dict_get(dict,str);
+      
+                if(value != NULL){
+                    write(sock, value, strlen(value));
+                }
+
             }
             else
                 write(sock, "BAD INPUT!\n", 12);

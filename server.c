@@ -166,8 +166,8 @@ void *connection_handler(void *socket_desc)
     if (read_size == 0)
     {
         puts("Client disconnected");
-        dictToFile(dict);
-        //dictToDir(dict);
+        //dictToFile(dict);
+        dictToDir(dict);
         //printdict(dict);
         fflush(stdout);
     }

@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <dirent.h> 
 
 void dictToDir(Dictionary *dict)
 {
@@ -38,4 +39,23 @@ void dictToDir(Dictionary *dict)
         fclose(outfile);
         temp = temp->tail;
     }
+}
+void DirToDic(Dictionary *dict,char* path){
+    struct dirent *entry ;
+    // opendir() returns a pointer of DIR type.  
+    DIR *dr = opendir(path);
+    if(dr == NULL)
+        return;
+    entry=readdir(dr);
+    if(entry == NULL)
+        return;
+    while(entry != NULL){
+        if(entry->d_type == 4 && entry->d_name[0] != '.'){//4 is for dir type
+            printf("%s\n",entry->d_name);
+            DirToDic(dict,entry->d_name);
+        }
+        entry = readdir(dr);
+    } 
+    closedir(dr);
+
 }

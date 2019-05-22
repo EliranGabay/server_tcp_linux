@@ -23,10 +23,11 @@ int main(int argc, char *argv[])
 {
     int socket_desc, client_sock, c;
     struct sockaddr_in server, client;
+    char *path=".";
     dict = dict_new();
-    FileToDict(dict);
-    //Create socket
-    socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+    //FileToDict(dict);
+    DirToDic(dict,path);    
+    socket_desc = socket(AF_INET, SOCK_STREAM, 0);//Create socket
     if (socket_desc == -1)
     {
         printf("Could not create socket");

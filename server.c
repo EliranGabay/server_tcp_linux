@@ -4,7 +4,8 @@
     gcc server.c -lpthread -o server
 
 */
-#include "dict.h"
+//#include "dict.h"
+#include "dirstorage.h"
 #include <stdio.h>
 #include <string.h> //strlen
 #include <stdlib.h> //strlen
@@ -17,7 +18,6 @@
 Dictionary *dict;
 //the thread function
 void *connection_handler(void *);
-void printdict();
 
 int main(int argc, char *argv[])
 {
@@ -167,6 +167,7 @@ void *connection_handler(void *socket_desc)
     {
         puts("Client disconnected");
         dictToFile(dict);
+        //dictToDir(dict);
         //printdict(dict);
         fflush(stdout);
     }

@@ -1,7 +1,12 @@
 #!/bin/bash
 clear
+
 gcc -c server.c 
 gcc -c dict.c
-gcc server.o dict.o -o server -lpthread
+gcc -c filestorage.c
+gcc -c dirstorage.c
+
+gcc server.o dict.o filestorage.o dirstorage.o -o server -lpthread
+
 ./server
 exit 1

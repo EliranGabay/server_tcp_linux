@@ -7,6 +7,6 @@ gcc -c filestorage.c
 gcc -c dirstorage.c
 
 gcc server.o dict.o filestorage.o dirstorage.o -o server -lpthread
-
-./server
+#-p port -s save dir -t type save dir/file
+./server -p 8888 
 exit 1

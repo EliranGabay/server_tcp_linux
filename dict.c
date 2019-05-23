@@ -9,7 +9,8 @@
 
 int size = 0;
 
-int getSize(){
+int getSize()
+{
     return size;
 }
 
@@ -163,4 +164,3 @@ void dict_free(Dictionary *dictionary)
     free(dictionary);
     dict_free(tail);
 }
-

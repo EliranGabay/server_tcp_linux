@@ -18,16 +18,26 @@
 Dictionary *dict;
 //the thread function
 void *connection_handler(void *);
+int runServer(int, char *);
 
 int main(int argc, char *argv[])
 {
+    char *path = ".";
+    runServer(1, path);
+}
+
+int runServer(int op, char *path)
+{
     int socket_desc, client_sock, c;
     struct sockaddr_in server, client;
-    char *path=".";
+
     dict = dict_new();
-    //FileToDict(dict);
-    DirToDic(dict,path);    
-    socket_desc = socket(AF_INET, SOCK_STREAM, 0);//Create socket
+    if (op == 1)
+        FileToDict(dict);
+    else
+        DirToDic(dict, path);
+
+    socket_desc = socket(AF_INET, SOCK_STREAM, 0); //Create socket
     if (socket_desc == -1)
     {
         printf("Could not create socket");
@@ -76,7 +86,6 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
-
 /*
  * This will handle connection for each client
  * */
@@ -87,7 +96,7 @@ void *connection_handler(void *socket_desc)
     int read_size;
     int b, e;
     const char ch = ' ';
-    char *message, client_message[2000], *ptr, *match, *key, *value,str[100];
+    char *message, client_message[2000], *ptr, *match, *key, *value, str[100];
     //Send some messages to the client
     message = "Greetings! I am your connection handler\n";
     write(sock, message, strlen(message));
@@ -113,6 +122,7 @@ void *connection_handler(void *socket_desc)
                 key = strtok(client_message, "!");
                 key = strtok(key, " ");
                 value = strtok(NULL, " ");
+                value[strlen(value) - 1] = '\0';
                 //write(sock, key, strlen(key));
                 //write(sock, value, strlen(value));
                 dict_add(dict, key, value);
@@ -124,9 +134,12 @@ void *connection_handler(void *socket_desc)
                 key = strtok(client_message, "!");
                 key[strlen(key) - 1] = '\0';
                 value = dict_get(dict, key);
+                char tempval[20];
+                strcpy(tempval, value);
+                strcat(tempval, "\n");
                 if (value != NULL)
                 {
-                    write(sock, value, strlen(value));
+                    write(sock, tempval, strlen(tempval));
                 }
             }
             else if (client_message[0] == '+')
@@ -139,7 +152,7 @@ void *connection_handler(void *socket_desc)
                 {
                     if (atoi(value) > 0)
                     {
-                        sprintf(value, "%d\n", (atoi(value) + 1));
+                        sprintf(value, "%d", (atoi(value) + 1));
                     }
                 }
             }
@@ -153,24 +166,26 @@ void *connection_handler(void *socket_desc)
                 sprintf(tempval, "%d\n", t);
                 write(sock, tempval, strlen(tempval));
             }
-               else if (client_message[0] == '-')
+            else if (client_message[0] == '-')
             {
                 client_message[0] = '!';
                 key = strtok(client_message, "!");
                 key[strlen(key) - 1] = '\0';
                 value = dict_get(dict, key);
                 value[strlen(value)] = '\0';
-          
+
                 strcpy(str, key);
                 strcat(str, ".");
-                strcat(str,value);
-                str[strlen(str)-1]='\0';
-                value = dict_get(dict,str);
-      
-                if(value != NULL){
-                    write(sock, value, strlen(value));
+                strcat(str, value);
+                //str[strlen(str) - 1] = '\0';
+                value = dict_get(dict, str);
+                char tempval[20];
+                strcpy(tempval, value);
+                strcat(tempval, "\n");
+                if (value != NULL)
+                {
+                    write(sock, tempval, strlen(tempval));
                 }
-
             }
             else
                 write(sock, "BAD INPUT!\n", 12);
@@ -183,8 +198,8 @@ void *connection_handler(void *socket_desc)
     if (read_size == 0)
     {
         puts("Client disconnected");
-        //dictToFile(dict);
-        dictToDir(dict);
+        dictToFile(dict);
+        //dictToDir(dict);
         //printdict(dict);
         fflush(stdout);
     }

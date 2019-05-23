@@ -56,8 +56,6 @@ void DirToDic(Dictionary *dict,char *basePath)
     {
         if (dp->d_name[0] != '.' && ( dp->d_type == 4 || dp->d_name[0] == '_' ))
         {   
-            printf("%s\n", dp->d_name);
-
             strcpy(path, basePath);
             strcat(path, "/");
             strcat(path, dp->d_name);

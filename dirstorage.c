@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h> 
+#include <stdlib.h>
 
 void dictToDir(Dictionary *dict)
 {
@@ -40,22 +41,55 @@ void dictToDir(Dictionary *dict)
         temp = temp->tail;
     }
 }
-void DirToDic(Dictionary *dict,char* path){
-    struct dirent *entry ;
-    // opendir() returns a pointer of DIR type.  
-    DIR *dr = opendir(path);
-    if(dr == NULL)
-        return;
-    entry=readdir(dr);
-    if(entry == NULL)
-        return;
-    while(entry != NULL){
-        if(entry->d_type == 4 && entry->d_name[0] != '.'){//4 is for dir type
-            printf("%s\n",entry->d_name);
-            DirToDic(dict,entry->d_name);
-        }
-        entry = readdir(dr);
-    } 
-    closedir(dr);
 
+void DirToDic(Dictionary *dict,char *basePath)
+{
+    char path[1000],val[10];
+    FILE *outfile;
+    struct dirent *dp;
+    DIR *dir = opendir(basePath);
+
+    if (!dir)
+        return;
+
+    while ((dp = readdir(dir)) != NULL)
+    {
+        if (dp->d_name[0] != '.' && ( dp->d_type == 4 || dp->d_name[0] == '_' ))
+        {   
+            printf("%s\n", dp->d_name);
+
+            strcpy(path, basePath);
+            strcat(path, "/");
+            strcat(path, dp->d_name);
+
+            if(dp->d_name[0] == '_'){
+                outfile = fopen(path, "r");
+                if (outfile == NULL) 
+                    return; 
+                fscanf(outfile,"%s\n",val);
+            
+                dict_add(dict,pathToKey(basePath),val);
+                fclose (outfile);
+             }
+            DirToDic(dict,path);
+        }
+    }
+
+    closedir(dir);
+}
+
+char* pathToKey(char *path){
+    char *str,*tmp,*con;
+    tmp=path;
+    tmp = strtok(tmp,"/");
+    con = strtok(NULL,tmp);
+    str=(char *)malloc(sizeof(char)*strlen(con));
+    strcpy(str,con);
+    for (int i = 0; i < strlen(str); i++)
+    { 
+        if(str[i] == '/')  
+            str[i]='.';
+        
+    }
+    return str;
 }

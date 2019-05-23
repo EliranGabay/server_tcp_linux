@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
     char *path=".";
     dict = dict_new();
     //FileToDict(dict);
-    DirToDic(dict,path);    
+    DirToDic(dict,path);
+    printdict(dict);    
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);//Create socket
     if (socket_desc == -1)
     {

@@ -82,7 +82,12 @@ int main(int argc, char *argv[])
             }
             else if (strcmp(argv[i], "--help") == 0) //print help
             {
-                printf("--Help\n");
+                char ch;
+                FILE *f=fopen("README","r");
+                  while((ch = fgetc(f)) != EOF)
+                    printf("%c", ch);
+                fclose(f);
+                exit(0);
             }
         }
         if (strcmp(flag,"t1")==0 || !strstr(flag, "t"))

@@ -1,0 +1,22 @@
+#An example for server tcp with makefile writen in c.
+
+* run example:
+#	server - default run (port = 8888 , storage = file.txt , save = ".").
+
+* to connect the server as a client: 
+#	nc localhost "port number".
+#	if port number is default use 8888.
+
+* options:
+#	server -p "port number".
+#	server -t "dir/file" (directory/file.txt).
+#	server -s ~/"your path".
+
+* make install
+#  Installs the executable in usr/local/bin.
+
+* make clean
+#  clear the .o files and server from the program folder.
+
+* make uninstall
+# remove the server file from usr/local/bin.

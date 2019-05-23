@@ -1,12 +1,16 @@
 #include "filestorage.h"
 #include <stdio.h>
 
-void dictToFile(Dictionary *dict)
+void dictToFile(Dictionary *dict, char *path)
 {
     FILE *outfile;
     Dictionary *temp = dict;
+    char path1[50];
+    strcpy(path1, path);
+    strcat(path1, "/");
+    strcat(path1, "storage.txt");
     // open file for writing
-    outfile = fopen("storage.txt", "w");
+    outfile = fopen(path1, "w");
     if (outfile == NULL)
     {
         fprintf(stderr, "\nError opend file\n");
@@ -25,12 +29,15 @@ void dictToFile(Dictionary *dict)
     fclose(outfile);
 }
 
-void FileToDict(Dictionary *dict)
+void FileToDict(Dictionary *dict, char *path)
 {
     FILE *outfile;
-    char key[10], value[10];
+    char key[10], value[10], path1[50];
     // open file for writing
-    outfile = fopen("storage.txt", "r");
+    strcpy(path1, path);
+    strcat(path1, "/");
+    strcat(path1, "storage.txt");
+    outfile = fopen(path1, "r");
     if (outfile == NULL)
     {
         return;

@@ -16,26 +16,98 @@
 #include <pthread.h>   //for threading , link with lpthread
 
 Dictionary *dict;
+int port;
+char path[50];
+char flag[3];
 //the thread function
 void *connection_handler(void *);
-int runServer(int, char *);
-
+int runServer();
 int main(int argc, char *argv[])
 {
-    char *path = ".";
-    runServer(1, path);
+    
+    strcpy(path, "."); //defult save dir
+    port = 8888;       //defult port
+    dict = dict_new();
+    if (argc < 2) //file text seve in defult dir(Defult op)
+    {
+        FileToDict(dict,path);
+        printf("Defult Run: storage: file.txt directory: '%s' port: '%d'\n", path, port);
+        printf("-----------------------------------------------\n");
+        runServer();
+        dictToFile(dict,path);
+    }
+    else
+    {
+        for (int i = 0; i < argc; i++)
+        {
+            if (strcmp(argv[i], "-t") == 0) //type save
+            {
+                if ((strcmp(argv[i + 1], "file") == 0))
+                    strcpy(flag, "t1");
+                else if (strcmp(argv[i + 1], "dir") == 0)
+                    strcpy(flag, "t2");
+                else
+                {
+                    printf("Erorr: -t get only file/dir\n");
+                    return 0;
+                }
+                
+                i++;
+            }
+            else if (strcmp(argv[i], "-s") == 0) //path
+            {
+                if (strstr(argv[i+1],"/"))
+                {
+                    strcpy(path, argv[i + 1]);
+                    i++;
+                }
+                else
+                {
+                    printf("Erorr: -s get only string at start '/'\n");
+                    return 0;
+                }
+            }
+            else if (strcmp(argv[i], "-p") == 0) //port connect
+            {
+                if (strcmp(argv[i + 1], "") != 0 && atoi(argv[i + 1]) > 10)
+                {
+                    port = atoi(argv[i + 1]);
+                    i++;
+                }
+                else
+                {
+                    printf("Erorr: -p not get int value\n");
+                    return 0;
+                }
+            }
+            else if (strcmp(argv[i], "--help") == 0) //print help
+            {
+                printf("--Help\n");
+            }
+        }
+        if (strcmp(flag,"t1")==0 || !strstr(flag, "t"))
+        {
+            FileToDict(dict,path);
+            printf("Run: storage: file.txt | directory: '%s' | port: '%d'\n", path, port);
+            printf("-----------------------------------------------\n");
+            runServer();
+            dictToFile(dict,path);
+        }
+        else
+        {
+            DirToDic(dict, path);
+            printf("Run: storage: directory | directory: '%s' | port: '%d'\n", path, port);
+            printf("-----------------------------------------------\n");
+            runServer();
+            dictToDir(dict);
+        }
+    }
 }
 
-int runServer(int op, char *path)
+int runServer()
 {
     int socket_desc, client_sock, c;
     struct sockaddr_in server, client;
-
-    dict = dict_new();
-    if (op == 1)
-        FileToDict(dict);
-    else
-        DirToDic(dict, path);
 
     socket_desc = socket(AF_INET, SOCK_STREAM, 0); //Create socket
     if (socket_desc == -1)
@@ -46,7 +118,7 @@ int runServer(int op, char *path)
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(8888);
+    server.sin_port = htons(port);
     //server.sin_port = htons(9999);
     //Bind
     if (bind(socket_desc, (struct sockaddr *)&server, sizeof(server)) < 0)
@@ -134,11 +206,11 @@ void *connection_handler(void *socket_desc)
                 key = strtok(client_message, "!");
                 key[strlen(key) - 1] = '\0';
                 value = dict_get(dict, key);
-                char tempval[20];
-                strcpy(tempval, value);
-                strcat(tempval, "\n");
                 if (value != NULL)
                 {
+                    char tempval[20];
+                    strcpy(tempval, value);
+                    strcat(tempval, "\n");
                     write(sock, tempval, strlen(tempval));
                 }
             }
@@ -179,11 +251,11 @@ void *connection_handler(void *socket_desc)
                 strcat(str, value);
                 //str[strlen(str) - 1] = '\0';
                 value = dict_get(dict, str);
-                char tempval[20];
-                strcpy(tempval, value);
-                strcat(tempval, "\n");
                 if (value != NULL)
                 {
+                    char tempval[20];
+                    strcpy(tempval, value);
+                    strcat(tempval, "\n");
                     write(sock, tempval, strlen(tempval));
                 }
             }
@@ -198,9 +270,13 @@ void *connection_handler(void *socket_desc)
     if (read_size == 0)
     {
         puts("Client disconnected");
-        dictToFile(dict);
-        //dictToDir(dict);
-        //printdict(dict);
+
+        if (strcmp(flag,"t1")==0 || !strstr(flag, "t"))
+        {
+            dictToFile(dict,path);
+        }
+        else
+            dictToDir(dict);
         fflush(stdout);
     }
     else if (read_size == -1)
